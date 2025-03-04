@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { App } from 'supertest/types';
+import request from 'supertest'; // Используем default import
 import { AppModule } from './../src/app.module';
+import { Server } from 'http'; // Импортируем тип Server из модуля http
 
 describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: INestApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -16,10 +16,17 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
+  afterEach(async () => {
+    await app.close();
+  });
+
+  it('/ (GET)', async () => {
+    // Явно указываем тип для httpServer
+    const httpServer = app.getHttpServer() as Server;
+
+    await request(httpServer)
       .get('/')
-      .expect(200)
+      .expect(200) // Объединяем в одну строку
       .expect('Hello World!');
   });
 });
