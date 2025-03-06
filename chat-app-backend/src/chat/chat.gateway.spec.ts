@@ -1,12 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ChatGateway } from './chat.gateway';
+import { ChatGateway } from './controllers/chat.gateway'; // Исправьте путь
+import { ChatService } from './services/chat.service'; // Исправьте путь
 
 describe('ChatGateway', () => {
   let gateway: ChatGateway;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ChatGateway],
+      providers: [
+        ChatGateway,
+        ChatService, // Добавьте ChatService
+      ],
     }).compile();
 
     gateway = module.get<ChatGateway>(ChatGateway);
