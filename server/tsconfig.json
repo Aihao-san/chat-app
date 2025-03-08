@@ -1,23 +1,24 @@
 {
   "compilerOptions": {
-    "module": "CommonJS", // Используем CommonJS
+    "module": "commonjs", // Используем commonjs (в нижнем регистре)
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "target": "ES2020",
+    "target": "es2020", // В нижнем регистре
     "strict": true,
     "skipLibCheck": true,
-    "outDir": "./dist",
-    "rootDir": "./",
-    "allowJs": true,
-    "checkJs": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "resolveJsonModule": true,
-    "baseUrl": "./",
+    "outDir": "./dist", // Папка для скомпилированных файлов
+    "rootDir": "./src", // Указываем корневую директорию исходников
+    "allowJs": true, // Разрешаем использование JavaScript
+    "checkJs": true, // Проверяем JavaScript файлы
+    "emitDecoratorMetadata": true, // Для поддержки декораторов
+    "experimentalDecorators": true, // Для поддержки декораторов
+    "resolveJsonModule": true, // Для импорта JSON файлов
+    "baseUrl": "./", // Базовый путь для разрешения модулей
     "paths": {
-      "@/*": ["src/*"]
-    }
+      "@/*": ["src/*"] // Алиасы для путей
+    },
+    "types": ["jest"] // Добавлено: Подключаем типы для Jest
   },
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*", "src/test/**/*"], // Включаем все файлы в папке src и test
+  "exclude": ["node_modules", "dist"] // Исключаем ненужные папки
 }

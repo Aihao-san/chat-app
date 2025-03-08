@@ -1,3 +1,11 @@
 # Игнорировать node_modules
 client/node_modules/
 server/node_modules/
+
+# Игнорировать скомпилированные файлы
+client/dist/
+server/dist/
+
+# Игнорировать временные файлы
+*.log
+*.tmp

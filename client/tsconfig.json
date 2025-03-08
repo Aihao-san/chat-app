@@ -1,22 +1,25 @@
 {
   "compilerOptions": {
-    /* Язык и окружение */
-    "target": "es2016", // Версия JavaScript, в которую будет компилироваться TypeScript
-    "module": "commonjs", // Используемый модуль (CommonJS для Node.js)
-    "esModuleInterop": true, // Упрощает работу с CommonJS-модулями
-    "skipLibCheck": true, // Пропускать проверку типов в .d.ts файлах
-    "forceConsistentCasingInFileNames": true, // Проверка регистра имен файлов
-    "strict": true, // Включает все строгие проверки типов
-
-    /* Настройки для работы с JavaScript */
-    "allowJs": true, // Разрешить использование JavaScript-файлов
-    "checkJs": true, // Проверять типы в JavaScript-файлах
-
-    /* Поддержка JSX */
-    "jsx": "react-jsx" // Включение поддержки JSX для React
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".", // Добавлено: Указывает базовый путь для разрешения модулей
+    "paths": {
+      // Добавлено: Настраивает пути для модулей
+      "*": ["src/*"]
+    }
   },
-
-  /* Пути и выходные файлы */
-  "include": ["src/**/*"], // Включать все файлы в папке src
-  "exclude": ["node_modules", "dist"] // Исключить папки node_modules и dist
+  "include": ["src/**/*"] // Убедитесь, что это включает все файлы в папке src
 }
