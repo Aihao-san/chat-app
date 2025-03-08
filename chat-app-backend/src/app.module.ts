@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ChatModule } from './chat/chat.module'; // Импортируйте ChatModule
+import { ChatController } from './chat.controller';
+import { ChatService } from './chat.service';
 
 @Module({
-  imports: [ChatModule], // Добавьте ChatModule
+  imports: [],
+  controllers: [ChatController],
+  providers: [ChatService],
 })
 export class AppModule {}

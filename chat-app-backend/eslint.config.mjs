@@ -31,6 +31,10 @@ export default tseslint.config(
       '@typescript-eslint/no-floating-promises': 'warn', // Предупреждение для забытых промисов
       '@typescript-eslint/no-unsafe-argument': 'warn', // Предупреждение для небезопасных аргументов
       'prettier/prettier': 'error', // Включаем Prettier для форматирования
+
+      // Новые правила
+      '@typescript-eslint/explicit-function-return-type': 'error', // Требует явного указания типа возвращаемого значения
+      '@typescript-eslint/no-unused-vars': 'warn', // Предупреждает о неиспользуемых переменных
     },
   },
 );
