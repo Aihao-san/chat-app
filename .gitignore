@@ -7,6 +7,9 @@ server/node_modules/
 dist/
 client/dist/
 server/dist/
+build/
+client/build/
+server/build/
 
 # Игнорировать временные файлы
 *.log
@@ -19,10 +22,16 @@ server/dist/
 .env.local
 .env.development
 .env.production
+.env.test
 
 # Игнорировать IDE-специфичные файлы
 .vscode/
 .idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # Игнорировать системные файлы
 .DS_Store
@@ -31,6 +40,7 @@ Thumbs.db
 # Игнорировать зависимости для тестов
 coverage/
 .nyc_output/
+*.lcov
 
 # Игнорировать файлы пакетных менеджеров
 package-lock.json
@@ -43,3 +53,36 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.pid
+*.seed
+*.pid.lock
+
+# Игнорировать локальные настройки
+.local/
+
+# Игнорировать файлы операционных систем
+*.swp
+*.swo
+*~
+*.orig
+*.rej
+
+# Игнорировать файлы редакторов
+*.sublime-workspace
+*.sublime-project
+
+# Игнорировать файлы сборки
+*.exe
+*.dll
+*.obj
+*.lib
+*.so
+*.dylib
+*.out
+*.app
+*.ipa
+*.apk
+*.jar
+*.war
+*.ear
+*.class
