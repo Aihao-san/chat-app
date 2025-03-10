@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { sendMessageToDeepSeek, DeepSeekResponse } from '@/deepseek/deepseek'; // Импортируем функцию и тип
 
 @Injectable()
 export class ChatService {
-  sendMessage(message: string): string {
-    return message; // Пример бизнес-логики
+  async sendMessage(message: string): Promise<DeepSeekResponse> {
+    // Возвращаем DeepSeekResponse
+    const response = await sendMessageToDeepSeek(message); // Вызываем функцию из deepseek
+    return response; // Возвращаем ответ
   }
 }

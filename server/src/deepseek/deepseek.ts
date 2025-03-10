@@ -2,10 +2,10 @@ import dotenv from 'dotenv';
 dotenv.config(); // Загружаем переменные из .env
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
-const DEEPSEEK_API_URL = 'https://api.deepseek.com'; // Уточните URL в документации DeepSeek
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions'; // Уточните URL в документации DeepSeek
 
 // Интерфейс для ответа от API DeepSeek
-interface DeepSeekResponse {
+export interface DeepSeekResponse {
   message: string; // Основное поле ответа
   // Добавьте другие поля, если они есть в ответе API
 }
@@ -31,6 +31,7 @@ export async function sendMessageToDeepSeek(
     }
 
     const data: DeepSeekResponse = await response.json();
+    console.log('Ответ от DeepSeek API:', data); // Логируем ответ
     return data;
   } catch (error) {
     console.error('Ошибка при запросе к API DeepSeek:', error);

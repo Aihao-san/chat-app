@@ -3,24 +3,21 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@nestjs/common": "^11.0.11",
-    "@nestjs/core": "^11.0.11",
-    "@nestjs/websockets": "^11.0.11",
-    "@types/axios": "^0.9.36",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
-    "ajv": "^8.17.1",
-    "ajv-keywords": "^5.1.0",
     "axios": "^1.8.2",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-scripts": "^5.0.1",
-    "socket.io": "^4.8.1"
+    "socket.io-client": "^4.8.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject"
   },
   "browserslist": {
@@ -36,6 +33,7 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^5.9.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.10",
     "typescript": "^4.9.5"

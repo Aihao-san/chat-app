@@ -17,8 +17,8 @@
     "paths": {
       "@/*": ["src/*"] // Алиасы для путей
     },
-    "types": ["jest"] // Подключаем типы для Jest
+    "types": ["jest", "node"] // Подключаем типы для Jest и Node.js
   },
   "include": ["src/**/*"], // Включаем все файлы в папке src
-  "exclude": ["node_modules", "dist"] // Исключаем ненужные папки
+  "exclude": ["node_modules", "dist", "test"] // Исключаем ненужные папки
 }

@@ -1,4 +1,6 @@
-import { sendMessageToDeepSeek } from './deepseek/deepseek';
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:3000'); // Подключение к серверу
 
 const chatWindow = document.getElementById(
   'chat-window'
@@ -45,25 +47,8 @@ if (
     // Показываем индикатор загрузки
     loadingIndicator.style.display = 'block';
 
-    try {
-      // Отправляем сообщение в DeepSeek
-      const botResponse = await sendMessageToDeepSeek(userMessage);
-
-      // Добавляем ответ бота в чат
-      addMessageToChat(botResponse.message, false);
-    } catch (error) {
-      console.error('Ошибка:', error);
-      let errorMessage = 'Произошла ошибка при обработке вашего сообщения.';
-
-      if (error instanceof Error) {
-        errorMessage = error.message; // Используем сообщение об ошибке, если оно есть
-      }
-
-      addMessageToChat(errorMessage, false);
-    } finally {
-      // Скрываем индикатор загрузки
-      loadingIndicator.style.display = 'none';
-    }
+    // Отправляем сообщение на сервер через WebSocket
+    socket.emit('message', userMessage);
   });
 
   // Обработка нажатия Enter
@@ -76,6 +61,27 @@ if (
   // Очистка чата
   clearChatButton.addEventListener('click', () => {
     chatWindow.innerHTML = ''; // Очищаем содержимое чата
+  });
+
+  // Слушаем ответ от сервера
+  socket.on('message', (response: string) => {
+    console.log('Ответ от сервера:', response); // Логируем ответ
+    // Добавляем ответ бота в чат
+    addMessageToChat(response, false);
+
+    // Скрываем индикатор загрузки
+    loadingIndicator.style.display = 'none';
+  });
+
+  // Слушаем ошибки от сервера
+  socket.on('error', (error: string) => {
+    console.error('Ошибка от сервера:', error);
+
+    // Добавляем сообщение об ошибке в чат
+    addMessageToChat(error, false);
+
+    // Скрываем индикатор загрузки
+    loadingIndicator.style.display = 'none';
   });
 } else {
   console.error('Один из элементов DOM не найден. Проверьте HTML-структуру.');
