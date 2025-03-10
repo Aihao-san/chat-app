@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "module": "commonjs", // Используем commonjs (в нижнем регистре)
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "target": "es2020", // В нижнем регистре
-    "strict": true,
-    "skipLibCheck": true,
+    "module": "commonjs", // Используем commonjs для Node.js
+    "moduleResolution": "node", // Разрешение модулей в стиле Node.js
+    "esModuleInterop": true, // Упрощение работы с CommonJS модулями
+    "target": "es2020", // Целевая версия JavaScript
+    "strict": true, // Включение строгой проверки типов
+    "skipLibCheck": true, // Пропуск проверки типов в библиотеках
     "outDir": "./dist", // Папка для скомпилированных файлов
     "rootDir": "./src", // Указываем корневую директорию исходников
     "allowJs": true, // Разрешаем использование JavaScript
@@ -17,8 +17,8 @@
     "paths": {
       "@/*": ["src/*"] // Алиасы для путей
     },
-    "types": ["jest"] // Добавлено: Подключаем типы для Jest
+    "types": ["jest"] // Подключаем типы для Jest
   },
-  "include": ["src/**/*", "src/test/**/*"], // Включаем все файлы в папке src и test
+  "include": ["src/**/*"], // Включаем все файлы в папке src
   "exclude": ["node_modules", "dist"] // Исключаем ненужные папки
 }

@@ -3,14 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@nestjs/common": "^11.0.11",
+    "@nestjs/core": "^11.0.11",
+    "@nestjs/websockets": "^11.0.11",
     "@types/axios": "^0.9.36",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
+    "ajv": "^8.17.1",
+    "ajv-keywords": "^5.1.0",
     "axios": "^1.8.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-scripts": "^5.0.1",
-    "typescript": "^5.3.3"
+    "socket.io": "^4.8.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -29,5 +34,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.10",
+    "typescript": "^4.9.5"
   }
 }
