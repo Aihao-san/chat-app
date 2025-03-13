@@ -1,23 +1,23 @@
 {
   "compilerOptions": {
-    "module": "commonjs", // Используем commonjs для Node.js
+    "target": "ES2020", // Целевая версия JavaScript
+    "module": "CommonJS", // Используем CommonJS для Node.js
     "moduleResolution": "node", // Разрешение модулей в стиле Node.js
     "esModuleInterop": true, // Упрощение работы с CommonJS модулями
-    "target": "es2020", // Целевая версия JavaScript
     "strict": true, // Включение строгой проверки типов
     "skipLibCheck": true, // Пропуск проверки типов в библиотеках
     "outDir": "./dist", // Папка для скомпилированных файлов
     "rootDir": "./src", // Указываем корневую директорию исходников
     "allowJs": true, // Разрешаем использование JavaScript
     "checkJs": true, // Проверяем JavaScript файлы
-    "emitDecoratorMetadata": true, // Для поддержки декораторов
-    "experimentalDecorators": true, // Для поддержки декораторов
     "resolveJsonModule": true, // Для импорта JSON файлов
     "baseUrl": "./", // Базовый путь для разрешения модулей
     "paths": {
       "@/*": ["src/*"] // Алиасы для путей
     },
-    "types": ["jest", "node"] // Подключаем типы для Jest и Node.js
+    "types": ["node", "jest"], // Подключаем типы для Node.js и Jest
+    "experimentalDecorators": true, // Включаем поддержку декораторов
+    "emitDecoratorMetadata": true // Включаем генерацию метаданных для декораторов
   },
   "include": ["src/**/*"], // Включаем все файлы в папке src
   "exclude": ["node_modules", "dist", "test"] // Исключаем ненужные папки

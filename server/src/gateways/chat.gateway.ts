@@ -4,22 +4,27 @@ import {
   SubscribeMessage,
   MessageBody,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
-import { sendMessageToDeepSeek, DeepSeekResponse } from '../deepseek/deepseek';
+import { Server, Socket } from 'socket.io';
+import { sendMessageToDeepSeek } from '../deepseek/deepseek'; // Подключаем функцию отправки сообщений
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: { origin: '*' } }) // Разрешаем CORS
 export class ChatGateway {
   @WebSocketServer()
   server!: Server;
 
   @SubscribeMessage('message')
-  async handleMessage(@MessageBody() message: string): Promise<void> {
+  async handleMessage(
+    @MessageBody() data: string,
+    client: Socket,
+  ): Promise<void> {
+    console.log(`Получено сообщение от клиента: ${data}`);
+
     try {
-      const response: DeepSeekResponse = await sendMessageToDeepSeek(message); // Обработка сообщения
-      this.server.emit('message', response.message); // Отправка ответа всем клиентам
+      const response = await sendMessageToDeepSeek(data); // Отправляем в DeepSeek API
+      this.server.emit('message', response.message); // Отправляем ответ клиентам
     } catch (error) {
-      console.error('Ошибка при обработке сообщения:', error);
-      this.server.emit('error', 'Произошла ошибка при обработке сообщения');
+      console.error('Ошибка при запросе к DeepSeek:', error);
+      client.emit('error', 'Ошибка обработки сообщения.');
     }
   }
 }

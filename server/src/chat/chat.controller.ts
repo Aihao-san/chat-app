@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
-import { ChatService } from './chat.service'; // Убедитесь, что путь правильный
+import { ChatService } from './services/chat.service';
 
 @Controller('api/chat')
 export class ChatController {
@@ -8,6 +8,7 @@ export class ChatController {
   @Post()
   async sendMessage(@Body('message') message: string) {
     const response = await this.chatService.getAIResponse(message);
+    this.chatService.addMessage(message);
     return { response };
   }
 

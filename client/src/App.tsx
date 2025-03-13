@@ -1,52 +1,89 @@
 import React, { useState, useEffect } from 'react';
-import socket from './socket'; // Импортируем настройку WebSocket
+import socket from './socket'; // Подключаем WebSocket
 
 const App = () => {
-  const [message, setMessage] = useState(''); // Состояние для ввода сообщения
-  const [messages, setMessages] = useState<string[]>([]); // Состояние для списка сообщений
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<
+    Array<{ text: string; isUser: boolean }>
+  >([]);
 
-  // Обработка входящих сообщений
   useEffect(() => {
-    // Слушаем событие 'message' от сервера
+    // Подключение к WebSocket и обработка входящих сообщений
     socket.on('message', (response: string) => {
-      setMessages((prevMessages) => [...prevMessages, response]); // Добавляем ответ в список
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: response, isUser: false },
+      ]);
     });
 
-    // Слушаем событие 'error' от сервера
     socket.on('error', (error: string) => {
-      console.error('Ошибка от сервера:', error);
+      console.error('Ошибка WebSocket:', error);
     });
 
-    // Отключаем слушатели при размонтировании компонента
     return () => {
       socket.off('message');
       socket.off('error');
     };
   }, []);
 
-  // Отправка сообщения
+  // Отправка сообщения через WebSocket
   const handleSendMessage = () => {
-    if (message.trim()) {
-      socket.emit('message', message); // Отправляем сообщение на сервер
-      setMessage(''); // Очищаем поле ввода
+    if (input.trim()) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: input, isUser: true },
+      ]); // Добавляем сообщение пользователя
+      socket.emit('message', input); // Отправляем через WebSocket
+      setInput('');
     }
   };
 
   return (
-    <div>
-      <h1>Чат с ИИ</h1>
-      <div>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <h1>Чат с DeepSeek</h1>
+      <div
+        style={{
+          border: '1px solid #ccc',
+          padding: '10px',
+          height: '300px',
+          overflowY: 'scroll',
+          marginBottom: '10px',
+        }}
+      >
         {messages.map((msg, index) => (
-          <p key={index}>{msg}</p> // Отображаем все сообщения
+          <div
+            key={index}
+            style={{
+              textAlign: msg.isUser ? 'right' : 'left',
+              marginBottom: '10px',
+            }}
+          >
+            <div
+              style={{
+                display: 'inline-block',
+                padding: '10px',
+                borderRadius: '10px',
+                backgroundColor: msg.isUser ? '#007bff' : '#f1f1f1',
+                color: msg.isUser ? '#fff' : '#000',
+              }}
+            >
+              {msg.text}
+            </div>
+          </div>
         ))}
       </div>
-      <input
-        type="text"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)} // Обновляем состояние при вводе
-        placeholder="Введите сообщение"
-      />
-      <button onClick={handleSendMessage}>Отправить</button>
+      <div>
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          style={{ width: '80%', padding: '10px', marginRight: '10px' }}
+          placeholder="Введите сообщение..."
+        />
+        <button onClick={handleSendMessage} style={{ padding: '10px 20px' }}>
+          Отправить
+        </button>
+      </div>
     </div>
   );
 };

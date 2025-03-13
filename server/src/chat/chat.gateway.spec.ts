@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ChatGateway } from './controllers/chat.gateway'; // Исправьте путь
-import { ChatService } from './services/chat.service'; // Исправьте путь
+import { ChatGateway } from './chat.gateway'; // Путь обновлён
+import { ChatService } from './services/chat.service'; // Путь обновлён
 
 describe('ChatGateway', () => {
   let gateway: ChatGateway;

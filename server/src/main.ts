@@ -1,20 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { NestExpressApplication } from '@nestjs/platform-express'; // Импортируем NestExpressApplication
-import { join } from 'path'; // Импортируем join для работы с путями
+import * as bodyParser from 'body-parser';
+import * as dotenv from 'dotenv';
+
+dotenv.config(); // ✅ Принудительно загружаем .env
 
 async function bootstrap() {
-  // Создаём приложение с использованием NestExpressApplication
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create(AppModule);
 
-  // Настройка раздачи статических файлов из папки client/build
-  app.useStaticAssets(join(__dirname, '..', 'client', 'build'));
+  app.use(bodyParser.json({ limit: '10mb' }));
+  app.use(bodyParser.urlencoded({ extended: true }));
 
-  // Перенаправление всех запросов на index.html (для SPA)
-  app.setBaseViewsDir(join(__dirname, '..', 'client', 'build'));
-  app.setViewEngine('html');
-
-  // Запуск сервера на порту 3000
   await app.listen(3000);
   console.log('Server is running on port 3000');
 }
