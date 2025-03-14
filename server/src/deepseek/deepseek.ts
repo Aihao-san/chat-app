@@ -26,22 +26,18 @@ export interface DeepSeekResponse {
 }
 
 /**
- * Выполняет поиск погоды и анализирует прогноз на несколько дней.
+ * Универсальная функция поиска информации в интернете.
  * @param query Запрос пользователя.
- * @returns Полный прогноз погоды.
+ * @returns Найденный ответ или сообщение об ошибке.
  */
-export async function fetchWeatherData(query: string): Promise<string> {
+export async function fetchInternetData(query: string): Promise<string> {
   try {
-    console.log(`🔍 Выполняем поиск в интернете по запросу: "${query}"`);
+    console.log(`🔍 Поиск в интернете: "${query}"`);
 
     if (!SERP_API_KEY) {
       console.error('❌ Ошибка: API-ключ SerpAPI отсутствует! Проверь .env');
       return '❌ Ошибка: API-ключ отсутствует.';
     }
-
-    console.log(
-      `🔑 Используем API-ключ: ${SERP_API_KEY.substring(0, 5)}********`,
-    );
 
     const response = await axios.get(`https://serpapi.com/search`, {
       params: {
@@ -51,53 +47,99 @@ export async function fetchWeatherData(query: string): Promise<string> {
       },
     });
 
-    console.log('🌍 Ответ от SerpAPI:', response.data);
-
     const results = response.data.organic_results;
-
     if (!results || results.length === 0) {
-      return '❌ Не удалось найти актуальную информацию.';
+      return '❌ Не удалось найти актуальную информацию. Попробуйте уточнить запрос.';
     }
 
-    let weatherData = '';
+    let extractedData = '';
     for (const result of results) {
       try {
         console.log(`📄 Извлекаем текст с: ${result.link}`);
         const pageResponse = await axios.get(result.link);
         const $ = cheerio.load(pageResponse.data);
 
-        let extractedWeather = '';
+        let pageText = '';
         $('p, span, div').each((_, el) => {
           const text = $(el).text().trim();
-          if (
-            /температура|°C|осадки|ветер|давление|влажность/.test(
-              text.toLowerCase(),
-            )
-          ) {
-            extractedWeather += `- ${text}\n`;
+          if (text.length > 20 && text.length < 300) {
+            pageText += `- ${text}\n`;
           }
         });
 
-        if (extractedWeather) {
-          weatherData += `🔹 **${result.title}**: \n${extractedWeather}\n🔗 [Источник](${result.link})\n\n`;
+        if (pageText) {
+          extractedData += `🔹 **${result.title}**: \n${pageText}\n🔗 [Источник](${result.link})\n\n`;
         }
       } catch (error) {
-        console.error(
-          `❌ Ошибка при получении данных с ${result.link}:`,
-          error,
-        );
+        console.error(`❌ Ошибка при обработке ${result.link}:`, error);
       }
     }
 
-    return weatherData || '❌ Не удалось получить точные данные о погоде.';
+    return (
+      extractedData ||
+      '❌ Не удалось получить полезные данные. Попробуйте уточнить запрос.'
+    );
   } catch (error) {
     console.error('❌ Ошибка при поиске в интернете:', error);
-    return '❌ Не удалось получить результаты из интернета.';
+    return '❌ Не удалось получить результаты. Попробуйте позже.';
   }
 }
 
 /**
- * Отправляет сообщение в DeepSeek API с учетом истории и прогноза погоды.
+ * Получает текущее время для указанного города.
+ * @param city Город, для которого нужно узнать время.
+ * @returns Время в указанном городе.
+ */
+async function getWorldTime(city: string): Promise<string> {
+  try {
+    console.log(`⏰ Запрашиваем текущее время для: ${city}`);
+
+    const response = await axios.get(
+      `http://worldtimeapi.org/api/timezone/Europe/${city}`,
+    );
+    const { datetime } = response.data;
+    const time = new Date(datetime).toLocaleTimeString('ru-RU');
+
+    return `⏰ Текущее время в ${city}: ${time}`;
+  } catch (error) {
+    console.error('❌ Ошибка при получении времени:', error);
+    return '❌ Не удалось получить текущее время.';
+  }
+}
+
+/**
+ * Определяет, нужен ли интернет-поиск.
+ * @param message Входящий запрос.
+ * @returns true, если требуется интернет-поиск.
+ */
+function requiresInternetSearch(message: string): boolean {
+  const searchTriggers = [
+    'новости',
+    'курс',
+    'погода',
+    'сколько стоит',
+    'актуальная информация',
+    'результаты матча',
+    'события',
+    'биография',
+    'история',
+  ];
+
+  const isSimpleQuestion = /(как|что|где|когда|почему|зачем)\s/.test(
+    message.toLowerCase(),
+  );
+  const isFactualQuestion = /(сколько|кто|какой|какая)\s/.test(
+    message.toLowerCase(),
+  );
+
+  return (
+    searchTriggers.some((trigger) => message.toLowerCase().includes(trigger)) ||
+    (isFactualQuestion && !isSimpleQuestion)
+  );
+}
+
+/**
+ * Отправляет сообщение в DeepSeek API с возможностью поиска в интернете.
  * @param message Текущее сообщение пользователя.
  * @param history История диалога.
  * @returns Ответ от DeepSeek API.
@@ -107,44 +149,24 @@ export async function sendMessageToDeepSeek(
   history: Array<{ role: string; content: string }> = [],
 ): Promise<DeepSeekResponse> {
   try {
-    let weatherData = '';
+    let additionalData = '';
 
-    if (
-      message.toLowerCase().includes('погода') ||
-      message.toLowerCase().includes('температура') ||
-      message.toLowerCase().includes('осадки') ||
-      message.toLowerCase().includes('ветер') ||
-      message.toLowerCase().includes('давление') ||
-      message.toLowerCase().includes('влажность')
-    ) {
-      console.log('🌍 Обнаружен запрос на поиск в интернете!');
-      weatherData = await fetchWeatherData(message);
+    if (message.toLowerCase().includes('время в')) {
+      const cityMatch = message.match(/время в\s+(.+)/i);
+      const city = cityMatch ? cityMatch[1].trim() : 'Moscow';
+      additionalData = await getWorldTime(city);
+    } else if (requiresInternetSearch(message)) {
+      additionalData = await fetchInternetData(message);
     }
 
-    // Сохраняем контекст беседы
-    if (history.length > 10) {
-      history = history.slice(-10);
-    }
-
-    // Если пользователь спросил "а в Питере?", бот должен помнить, что речь о погоде
-    const lastUserMessage =
-      history.length > 0
-        ? history[history.length - 1].content.toLowerCase()
-        : '';
-    if (message.toLowerCase().includes('а в')) {
-      const lastCityMatch = lastUserMessage.match(/в (\w+)/);
-      if (lastCityMatch) {
-        message = `погода в ${lastCityMatch[1]}`;
-      }
-    }
-
+    history = history.slice(-10);
     history.push({ role: 'user', content: message });
 
     const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       {
         role: 'system',
         content:
-          'Ты умный помощник. Всегда отвечай на русском. Анализируй интернет-данные и предлагай пользователю точный прогноз погоды, включая температуру, осадки, ветер и давление.',
+          'Ты интеллектуальный помощник. Если у тебя нет информации, используй интернет для поиска. Отвечай кратко и понятно.',
       },
       ...history.map((msg) => ({
         role: msg.role as 'user' | 'assistant',
@@ -153,43 +175,26 @@ export async function sendMessageToDeepSeek(
       { role: 'user', content: message },
     ];
 
-    if (weatherData) {
-      console.log(
-        '🌍 Добавляем данные из интернета в запрос к DeepSeek:',
-        weatherData,
-      );
-      messages.push({
-        role: 'system',
-        content: `Вот актуальные данные о погоде:\n${weatherData}\n\nПредставь информацию кратко и понятно.`,
-      });
-    }
-
-    console.log(
-      '📨 Отправляем в DeepSeek API:',
-      JSON.stringify(messages, null, 2),
-    );
-
     const completion = await openai.chat.completions.create({
       messages,
       model: 'deepseek-chat',
     });
 
-    if (!completion.choices[0]?.message?.content) {
-      throw new Error('Неверный формат ответа от DeepSeek API');
+    let botResponse =
+      completion.choices[0]?.message?.content ||
+      '❌ Ошибка в ответе от DeepSeek API.';
+
+    // Если ответ содержит код, оборачиваем его в тройные кавычки
+    if (botResponse.includes('```')) {
+      botResponse = botResponse.replace(/```([\s\S]+?)```/g, '```\n$1\n```');
     }
 
-    const response = {
-      message: completion.choices[0].message.content,
-      history: [
-        ...history,
-        { role: 'assistant', content: completion.choices[0].message.content },
-      ],
+    return {
+      message: botResponse,
+      history: [...history, { role: 'assistant', content: botResponse }],
     };
-
-    console.log('✅ Ответ от DeepSeek API:', response);
-    return response;
   } catch (error) {
-    console.error('❌ Ошибка при запросе к API DeepSeek:', error);
+    console.error('❌ Ошибка при запросе к DeepSeek API:', error);
     throw error;
   }
 }

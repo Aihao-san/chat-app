@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import socket from './socket'; // Подключаем WebSocket
+import socket from './socket';
+import CodeBlock from './components/CodeBlock';
 
 const App = () => {
   const [input, setInput] = useState('');
@@ -8,7 +9,6 @@ const App = () => {
   >([]);
 
   useEffect(() => {
-    // Подключение к WebSocket и обработка входящих сообщений
     socket.on('message', (response: string) => {
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -26,16 +26,25 @@ const App = () => {
     };
   }, []);
 
-  // Отправка сообщения через WebSocket
   const handleSendMessage = () => {
     if (input.trim()) {
       setMessages((prevMessages) => [
         ...prevMessages,
         { text: input, isUser: true },
-      ]); // Добавляем сообщение пользователя
-      socket.emit('message', input); // Отправляем через WebSocket
+      ]);
+      socket.emit('message', input);
       setInput('');
     }
+  };
+
+  const isCodeBlock = (text: string) => {
+    // Проверяем, начинается ли текст с ``` и заканчивается ли на ```
+    return text.startsWith('```') && text.endsWith('```');
+  };
+
+  const extractCodeContent = (text: string) => {
+    // Убираем тройные кавычки в начале и конце
+    return text.slice(3, -3).trim();
   };
 
   return (
@@ -50,27 +59,36 @@ const App = () => {
           marginBottom: '10px',
         }}
       >
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            style={{
-              textAlign: msg.isUser ? 'right' : 'left',
-              marginBottom: '10px',
-            }}
-          >
+        {messages.map((msg, index) => {
+          const isCode = isCodeBlock(msg.text.trim());
+          const codeContent = isCode ? extractCodeContent(msg.text.trim()) : '';
+
+          return (
             <div
+              key={index}
               style={{
-                display: 'inline-block',
-                padding: '10px',
-                borderRadius: '10px',
-                backgroundColor: msg.isUser ? '#007bff' : '#f1f1f1',
-                color: msg.isUser ? '#fff' : '#000',
+                textAlign: msg.isUser ? 'right' : 'left',
+                marginBottom: '10px',
               }}
             >
-              {msg.text}
+              <div
+                style={{
+                  display: 'inline-block',
+                  padding: '10px',
+                  borderRadius: '10px',
+                  backgroundColor: msg.isUser ? '#007bff' : '#f1f1f1',
+                  color: msg.isUser ? '#fff' : '#000',
+                }}
+              >
+                {isCode ? (
+                  <CodeBlock language="python" code={codeContent} />
+                ) : (
+                  msg.text
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <div>
         <input

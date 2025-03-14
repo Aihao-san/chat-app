@@ -1,27 +1,26 @@
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:3000'); // Подключение к серверу
+const socket = io('http://localhost:3000', {
+  transports: ['websocket'], // WebSocket only
+  reconnection: true,
+});
 
 document.addEventListener('DOMContentLoaded', () => {
-  const chatWindow = document.getElementById(
-    'chat-window'
-  ) as HTMLDivElement | null;
-  const userInput = document.getElementById(
-    'user-input'
-  ) as HTMLInputElement | null;
+  const chatWindow = document.getElementById('chat-window') as HTMLDivElement;
+  const userInput = document.getElementById('user-input') as HTMLInputElement;
   const sendButton = document.getElementById(
     'send-button'
-  ) as HTMLButtonElement | null;
+  ) as HTMLButtonElement;
   const clearChatButton = document.getElementById(
     'clear-chat'
-  ) as HTMLButtonElement | null;
+  ) as HTMLButtonElement;
 
   if (!chatWindow || !userInput || !sendButton || !clearChatButton) {
-    console.error('Ошибка: не найдены элементы чата!');
+    console.error('❌ Ошибка: не найдены элементы чата!');
     return;
   }
 
-  // Функция для добавления сообщений в чат
+  // Функция добавления сообщений в чат
   const addMessageToChat = (message: string, isUser = true) => {
     const messageElement = document.createElement('div');
     messageElement.classList.add(
@@ -30,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     messageElement.textContent = message;
     chatWindow.appendChild(messageElement);
-    chatWindow.scrollTop = chatWindow.scrollHeight; // Прокрутка вниз
+    chatWindow.scrollTop = chatWindow.scrollHeight;
   };
 
   // Обработка отправки сообщения
@@ -38,10 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const userMessage = userInput.value.trim();
     if (userMessage === '') return;
 
-    addMessageToChat(userMessage, true); // Добавляем сообщение пользователя в чат
-    userInput.value = ''; // Очищаем поле ввода
+    console.log('📨 Кнопка отправки нажата:', userMessage);
 
-    // Отправляем сообщение через WebSocket
+    addMessageToChat(userMessage, true);
+    userInput.value = '';
+
+    // Отправляем через WebSocket
     socket.emit('message', userMessage);
   });
 
@@ -54,18 +55,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Очистка чата
   clearChatButton.addEventListener('click', () => {
-    chatWindow.innerHTML = ''; // Очищаем содержимое чата
+    console.log('🧹 Очистка чата');
+    chatWindow.innerHTML = '';
   });
 
-  // Слушаем ответ от сервера
+  // Обработка ответа сервера
   socket.on('message', (response: string) => {
-    console.log('Ответ от сервера:', response);
+    console.log('📩 Получено сообщение от сервера:', response);
     addMessageToChat(response, false);
   });
 
-  // Слушаем ошибки от сервера
+  // Обработка ошибок
   socket.on('error', (error: string) => {
-    console.error('Ошибка от сервера:', error);
-    addMessageToChat(error, false);
+    console.error('⚠️ Ошибка от сервера:', error);
+    addMessageToChat('Ошибка: ' + error, false);
   });
+
+  console.log('✅ Кнопки и WebSocket настроены');
 });

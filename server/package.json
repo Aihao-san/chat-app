@@ -5,6 +5,7 @@
   "main": "dist/src/main.js",
   "scripts": {
     "start": "nest start",
+    "start:server": "npm run start",
     "build": "nest build",
     "start:dev": "nest start --watch",
     "test": "jest"
